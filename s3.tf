@@ -84,7 +84,7 @@ data "aws_iam_policy_document" "bucket_policy_redirect" {
 
     principals {
       type        = "AWS"
-      identifiers = ["arn:aws:iam::cloudfront:user/CloudFront Origin Access Identity ${aws_cloudfront_origin_access_identity.origin_access_identity_redirect.id}"]
+      identifiers = ["arn:aws:iam::cloudfront:user/CloudFront Origin Access Identity ${aws_cloudfront_origin_access_identity.origin_access_identity.id}"]
     }
   }
 }

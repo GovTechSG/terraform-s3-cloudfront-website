@@ -18,7 +18,6 @@ variable "redirect_domain_names" {
   type        = list(string)
 }
 
-
 variable "cloudfront_origin_path" {
   default     = ""
   description = "Origin path of CloudFront"
@@ -56,6 +55,12 @@ variable "s3_logging_bucket" {
 
 variable "s3_logging_bucket_prefix" {
   description = "Bucket which will store s3 access logs"
+  type        = string
+  default     = ""
+}
+
+variable "permissions_boundary" {
+  description = "If provided, all IAM roles will be created with this permissions boundary attached."
   type        = string
   default     = ""
 }

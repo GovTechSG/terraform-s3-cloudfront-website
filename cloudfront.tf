@@ -7,10 +7,6 @@ resource "aws_cloudfront_origin_access_identity" "origin_access_identity" {
   comment = "website"
 }
 
-resource "aws_cloudfront_origin_access_identity" "origin_access_identity_redirect" {
-  comment = "website_redirect"
-}
-
 resource "aws_cloudfront_distribution" "web_dist" {
   enabled             = true
   is_ipv6_enabled     = true
@@ -42,7 +38,7 @@ resource "aws_cloudfront_distribution" "web_dist" {
 
     content {
       include_cookies = true
-      bucket          = var.s3_logging_bucket
+      bucket          = "${var.s3_logging_bucket}.s3.amazonaws.com"
       prefix          = "cloudfront/${var.domain_names[0]}"
     }
   }
@@ -98,15 +94,6 @@ resource "aws_cloudfront_distribution" "web_redirect" {
   price_class         = "PriceClass_200"
   aliases             = var.redirect_domain_names
 
-  // origin {
-  //   domain_name = aws_s3_bucket.redirect.website_endpoint
-  //   origin_id   = local.s3_redirect_origin_id
-  //   origin_path = var.cloudfront_origin_path
-
-  //   s3_origin_config {
-  //     origin_access_identity = aws_cloudfront_origin_access_identity.origin_access_identity_redirect.cloudfront_access_identity_path
-  //   }
-  // }
   origin {
     domain_name = aws_s3_bucket.redirect.website_endpoint
     origin_id   = local.s3_redirect_origin_id
@@ -123,7 +110,7 @@ resource "aws_cloudfront_distribution" "web_redirect" {
 
     content {
       include_cookies = true
-      bucket          = var.s3_logging_bucket
+      bucket          = "${var.s3_logging_bucket}.s3.amazonaws.com"
       prefix          = "cloudfront/${var.redirect_domain_names[0]}"
     }
   }
@@ -148,12 +135,10 @@ resource "aws_cloudfront_distribution" "web_redirect" {
     default_ttl            = 3600
     max_ttl                = 86400
 
-    dynamic "lambda_function_association" {
-      for_each = var.lambda_function_associations
-      content {
-        event_type = lambda_function_association.key
-        lambda_arn = lambda_function_association.value
-      }
+    lambda_function_association {
+      event_type   = "origin-request"
+      lambda_arn   = aws_lambda_function.redirect.qualified_arn
+      include_body = true
     }
   }
 

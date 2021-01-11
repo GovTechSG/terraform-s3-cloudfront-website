@@ -8,6 +8,11 @@ output "cache_invalidation_command" {
   value = "aws cloudfront create-invalidation  --distribution-id ${aws_cloudfront_distribution.web_dist.id} --paths /path/to/invalidation/resource"
 }
 
+output "cache_invalidation_redirect_command" {
+  description = "CloudFront edge cache invalidation command. /path/to/invalidation/resource is like /index.html /error.html"
+  value = "aws cloudfront create-invalidation  --distribution-id ${aws_cloudfront_distribution.web_redirect.id} --paths /path/to/invalidation/resource"
+}
+
 output "cloudfront_distribution_main_arn" {
   description = "ARN of cloudfront distribution"
   value = aws_cloudfront_distribution.web_dist.arn
