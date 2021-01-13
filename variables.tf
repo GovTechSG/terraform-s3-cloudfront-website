@@ -67,6 +67,6 @@ variable "permissions_boundary" {
 
 variable "main_default_ttl" {
   description = "default TTL of the main cloudfront distribution"
-  value       = 180
+  default     = 180
   type        = number
 }
