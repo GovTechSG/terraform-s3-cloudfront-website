@@ -60,7 +60,7 @@ resource "aws_cloudfront_distribution" "web_dist" {
 
     viewer_protocol_policy = "redirect-to-https"
     min_ttl                = 0
-    default_ttl            = 3600
+    default_ttl            = var.main_default_ttl
     max_ttl                = 86400
 
     dynamic "lambda_function_association" {
@@ -105,6 +105,7 @@ resource "aws_cloudfront_distribution" "web_redirect" {
       origin_ssl_protocols = ["TLSv1.2"]
     }
   }
+
   dynamic "logging_config" {
     for_each = var.save_access_log ? { "dummy" : "dummy" } : {}
 

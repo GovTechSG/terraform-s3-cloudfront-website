@@ -64,3 +64,9 @@ variable "permissions_boundary" {
   type        = string
   default     = ""
 }
+
+variable "main_default_ttl" {
+  description = "default TTL of the main cloudfront distribution"
+  value       = 180
+  type        = number
+}
