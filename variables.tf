@@ -70,3 +70,9 @@ variable "main_default_ttl" {
   default     = 180
   type        = number
 }
+
+variable "web_acl_id" {
+  description = "WAF ACL to attach to the cloudfront distribution"
+  default     = ""
+  type        = string
+}

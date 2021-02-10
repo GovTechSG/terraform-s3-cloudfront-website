@@ -1,7 +1,7 @@
 resource "local_file" "redirect-template" {
   content = templatefile(
     "${path.module}/redirect-lambda/template/redirect.js",
-    { redirect_to = var.domain_names[0]}
+    { redirect_to = var.domain_names[0] }
   )
   filename = "${path.module}/redirect-lambda/redirect.js"
 }
@@ -39,9 +39,9 @@ EOF
 }
 
 resource "aws_iam_role" "lambda_execution" {
-  name_prefix        = "lambda-execution-role-"
-  description        = "Managed by Terraform"
-  assume_role_policy = <<EOF
+  name_prefix          = "lambda-execution-role-"
+  description          = "Managed by Terraform"
+  assume_role_policy   = <<EOF
 {
   "Version": "2012-10-17",
   "Statement": [

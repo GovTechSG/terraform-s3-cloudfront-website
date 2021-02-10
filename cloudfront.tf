@@ -1,5 +1,5 @@
 locals {
-  s3_origin_id = "${var.domain_names[0]}${var.cloudfront_origin_path}"
+  s3_origin_id          = "${var.domain_names[0]}${var.cloudfront_origin_path}"
   s3_redirect_origin_id = "${var.redirect_domain_names[0]}${var.cloudfront_origin_path}"
 }
 
@@ -14,6 +14,7 @@ resource "aws_cloudfront_distribution" "web_dist" {
   default_root_object = "index.html"
   price_class         = "PriceClass_200"
   aliases             = var.domain_names
+  web_acl_id          = var.web_acl_id
 
   origin {
     domain_name = aws_s3_bucket.main.bucket_regional_domain_name
@@ -88,21 +89,22 @@ resource "aws_cloudfront_distribution" "web_dist" {
 
 
 resource "aws_cloudfront_distribution" "web_redirect" {
-  enabled             = true
-  is_ipv6_enabled     = true
-  comment             = var.service_name
-  price_class         = "PriceClass_200"
-  aliases             = var.redirect_domain_names
+  enabled         = true
+  is_ipv6_enabled = true
+  comment         = var.service_name
+  price_class     = "PriceClass_200"
+  aliases         = var.redirect_domain_names
+  web_acl_id      = var.web_acl_id
 
   origin {
     domain_name = aws_s3_bucket.redirect.website_endpoint
     origin_id   = local.s3_redirect_origin_id
     custom_origin_config {
-      http_port = 80
+      http_port  = 80
       https_port = 80
 
       origin_protocol_policy = "match-viewer"
-      origin_ssl_protocols = ["TLSv1.2"]
+      origin_ssl_protocols   = ["TLSv1.2"]
     }
   }
 
