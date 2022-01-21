@@ -71,6 +71,8 @@ resource "aws_lambda_function" "redirect" {
   provider         = aws.us-east-1
   publish          = true
   role             = aws_iam_role.lambda_execution.arn
-  runtime          = "nodejs10.x"
-
+  runtime          = "nodejs14.x"
+  tags             = {
+    "Description" = "Created by Terraform at ${timestamp()}"
+  }
 }
