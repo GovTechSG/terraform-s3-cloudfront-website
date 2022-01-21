@@ -73,6 +73,6 @@ resource "aws_lambda_function" "redirect" {
   role             = aws_iam_role.lambda_execution.arn
   runtime          = "nodejs14.x"
   tags             = {
-    Description = "Created by Terraform at ${timestamp()}"
+    Description = "Created by Terraform"
   }
 }
