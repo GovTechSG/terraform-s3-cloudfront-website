@@ -1,55 +1,88 @@
 resource "aws_s3_bucket" "main" {
   bucket = var.domain_names[0]
-  policy = data.aws_iam_policy_document.bucket_policy.json
-
   // acl = "private"
-  website {
-    index_document = "index.html"
-    error_document = "index.html"
+}
+resource "aws_s3_bucket_policy" "main" {
+  bucket = aws_s3_bucket.main.bucket
+  policy = data.aws_iam_policy_document.bucket_policy.json
+}
+
+resource "aws_s3_bucket_website_configuration" "main" {
+  bucket = aws_s3_bucket.main.bucket
+  index_document {
+    suffix = "index.html"
   }
 
-  server_side_encryption_configuration {
-    rule {
-      apply_server_side_encryption_by_default {
-        sse_algorithm = "AES256"
-      }
+  error_document {
+    key = "index.html"
+  }
+}
+
+resource "aws_s3_bucket_server_side_encryption_configuration" "main" {
+  bucket = aws_s3_bucket.main.bucket
+  rule {
+    apply_server_side_encryption_by_default {
+      sse_algorithm = "AES256"
     }
   }
+}
 
-  logging {
-    target_bucket = var.s3_logging_bucket
-    target_prefix = "s3/${var.domain_names[0]}/"
-  }
+resource "aws_s3_bucket_logging" "main" {
+  bucket = aws_s3_bucket.main.bucket
 
-  versioning {
-    enabled = true
+  target_bucket = var.s3_logging_bucket
+  target_prefix = "s3/${var.domain_names[0]}/"
+}
+
+resource "aws_s3_bucket_versioning" "main" {
+  bucket = aws_s3_bucket.main.bucket
+  versioning_configuration {
+    status = "Enabled"
   }
 }
 
 resource "aws_s3_bucket" "redirect" {
   bucket = var.redirect_domain_names[0]
-  policy = data.aws_iam_policy_document.bucket_policy_redirect.json
+}
+
+resource "aws_s3_bucket_acl" "redirect" {
+  bucket = aws_s3_bucket.redirect.bucket
   acl    = "private"
+}
 
-  website {
-    redirect_all_requests_to = aws_s3_bucket.main.id
+resource "aws_s3_bucket_policy" "redirect" {
+  bucket = aws_s3_bucket.redirect.bucket
+  policy = data.aws_iam_policy_document.bucket_policy_redirect.json
+}
+
+resource "aws_s3_bucket_website_configuration" "redirect" {
+  bucket = aws_s3_bucket.redirect.bucket
+
+  redirect_all_requests_to {
+    host_name = var.domain_names[0]
   }
+}
 
-  server_side_encryption_configuration {
-    rule {
-      apply_server_side_encryption_by_default {
-        sse_algorithm = "AES256"
-      }
+resource "aws_s3_bucket_server_side_encryption_configuration" "redirect" {
+  bucket = aws_s3_bucket.redirect.bucket
+  rule {
+    apply_server_side_encryption_by_default {
+      sse_algorithm = "AES256"
     }
   }
+}
 
-  logging {
-    target_bucket = var.s3_logging_bucket
-    target_prefix = "s3/${var.redirect_domain_names[0]}/"
-  }
+resource "aws_s3_bucket_logging" "redirect" {
+  bucket = aws_s3_bucket.redirect.bucket
 
-  versioning {
-    enabled = true
+  target_bucket = var.s3_logging_bucket
+  target_prefix = "s3/${var.redirect_domain_names[0]}/"
+}
+
+resource "aws_s3_bucket_versioning" "redirect" {
+  bucket = aws_s3_bucket.redirect.bucket
+  versioning_configuration {
+    status = "Enabled"
   }
 }
 

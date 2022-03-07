@@ -1,4 +1,21 @@
 # s3-cloudfront-website
+
+Creates a cloudfront distribution website using s3 bucket website configuration for static file hosting.
+
+# Upgrade notes
+
+### v1.x.x to v2.x.x upgrade
+
+Take note of the breaking changes from [AWS v4 upgrade guid e](https://registry.terraform.io/providers/hashicorp/aws/latest/docs/guides/version-4-upgrade#s3-bucket-refactor)
+
+You will have to run terraform import, e.g replace var.domain_name[0] with your host name `terraform import aws_s3_bucket_logging var.domain_name[0]` for each of the following.
+- `aws_s3_bucket_acl`
+- `aws_s3_bucket_logging`
+- `aws_s3_bucket_policy`
+- `aws_s3_bucket_server_side_encryption_configuration`
+- `aws_s3_bucket_versioning`
+- `aws_s3_bucket_website_configuration`
+
 ## Requirements
 
 No requirements.
