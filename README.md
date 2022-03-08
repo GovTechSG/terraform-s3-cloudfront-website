@@ -2,7 +2,11 @@
 
 Creates a cloudfront distribution website using s3 bucket website configuration for static file hosting.
 
-# Upgrade notes
+## Diagram
+
+![architecture diagram](diagram.png)
+
+## Upgrade notes
 
 ### v1.x.x to v2.x.x upgrade
 
