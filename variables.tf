@@ -80,8 +80,8 @@ variable "web_acl_id" {
 variable "ordered_cache_behaviors" {
   description = ""
   default     = []
-  type        = list(object({
-    path = string
+  type = list(object({
+    path                  = string
     function-associations = map(string)
   }))
 }
