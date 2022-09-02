@@ -102,6 +102,32 @@ data "aws_iam_policy_document" "bucket_policy" {
       identifiers = ["arn:aws:iam::cloudfront:user/CloudFront Origin Access Identity ${aws_cloudfront_origin_access_identity.origin_access_identity.id}"]
     }
   }
+
+  statement {
+    sid = "https-only"
+
+    principals {
+      type        = "*"
+      identifiers = ["*"]
+    }
+
+    effect = "Deny"
+
+    actions = [
+      "s3:*",
+    ]
+
+    resources = [
+      "arn:aws:s3:::${var.domain_names[0]}",
+      "arn:aws:s3:::${var.domain_names[0]}/*",
+    ]
+
+    condition {
+      test     = "Bool"
+      variable = "aws:SecureTransport"
+      values   = [false]
+    }
+  }
 }
 
 data "aws_iam_policy_document" "bucket_policy_redirect" {
@@ -118,6 +144,32 @@ data "aws_iam_policy_document" "bucket_policy_redirect" {
     principals {
       type        = "AWS"
       identifiers = ["arn:aws:iam::cloudfront:user/CloudFront Origin Access Identity ${aws_cloudfront_origin_access_identity.origin_access_identity.id}"]
+    }
+  }
+
+  statement {
+    sid = "https-only"
+
+    principals {
+      type        = "*"
+      identifiers = ["*"]
+    }
+
+    effect = "Deny"
+
+    actions = [
+      "s3:*",
+    ]
+
+    resources = [
+      "arn:aws:s3:::${var.redirect_domain_names[0]}",
+      "arn:aws:s3:::${var.redirect_domain_names[0]}/*",
+    ]
+
+    condition {
+      test     = "Bool"
+      variable = "aws:SecureTransport"
+      values   = [false]
     }
   }
 }
