@@ -26,14 +26,13 @@ resource "aws_cloudfront_distribution" "web_dist" {
     }
   }
 
-  # SPA用のエラーハンドリング
+  # SPA
   custom_error_response {
     error_code         = 403
     response_code      = 200
     response_page_path = "/index.html"
   }
 
-  # ifが使えないのでdynamicを使う
   dynamic "logging_config" {
     for_each = var.save_access_log ? { "dummy" : "dummy" } : {}
 
@@ -51,7 +50,7 @@ resource "aws_cloudfront_distribution" "web_dist" {
     compress         = true
 
     forwarded_values {
-      query_string = false
+      query_string = var.forward_query_string
       headers      = ["Origin", "Access-Control-Request-Method", "Access-Control-Request-Headers"]
 
       cookies {
@@ -84,7 +83,7 @@ resource "aws_cloudfront_distribution" "web_dist" {
       viewer_protocol_policy = "redirect-to-https"
 
       forwarded_values {
-        query_string = false
+        query_string = var.forward_query_string
         headers      = ["Origin", "Access-Control-Request-Method", "Access-Control-Request-Headers"]
 
         cookies {
@@ -159,7 +158,7 @@ resource "aws_cloudfront_distribution" "web_redirect" {
     compress         = true
 
     forwarded_values {
-      query_string = false
+      query_string = var.forward_query_string
       headers      = ["Origin", "Access-Control-Request-Method", "Access-Control-Request-Headers"]
 
       cookies {

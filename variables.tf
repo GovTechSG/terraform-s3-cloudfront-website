@@ -85,3 +85,9 @@ variable "ordered_cache_behaviors" {
     function-associations = map(string)
   }))
 }
+
+variable "forward_query_string" {
+  description = "forward query strings to origin"
+  default     = false
+  type        = bool
+}
