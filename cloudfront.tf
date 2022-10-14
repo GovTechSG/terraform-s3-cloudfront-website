@@ -12,7 +12,6 @@ resource "aws_cloudfront_response_headers_policy" "web_dist" {
 
   security_headers_config {
     content_security_policy {
-      # content_security_policy = "default-src 'none'; connect-src https://*.supplyally.gov.sg; font-src 'self'; img-src 'self'; script-src 'self'; style-src 'self' 'unsafe-inline'; object-src 'none'"
       content_security_policy = var.content_security_policy
       override                = false
     }
@@ -55,7 +54,6 @@ resource "aws_cloudfront_distribution" "web_dist" {
   aliases             = var.domain_names
   web_acl_id          = var.web_acl_id
 
-
   origin {
     domain_name = aws_s3_bucket.main.bucket_regional_domain_name
     origin_id   = local.s3_origin_id
@@ -84,12 +82,12 @@ resource "aws_cloudfront_distribution" "web_dist" {
   }
 
   default_cache_behavior {
-    allowed_methods  = ["GET", "HEAD", "OPTIONS"]
-    cached_methods   = ["GET", "HEAD", "OPTIONS"]
-    target_origin_id = local.s3_origin_id
-    compress         = true
-
+    allowed_methods            = ["GET", "HEAD", "OPTIONS"]
+    cached_methods             = ["GET", "HEAD", "OPTIONS"]
+    target_origin_id           = local.s3_origin_id
+    compress                   = true
     response_headers_policy_id = aws_cloudfront_response_headers_policy.web_dist.id
+
     forwarded_values {
       query_string = var.forward_query_string
       headers      = ["Origin", "Access-Control-Request-Method", "Access-Control-Request-Headers"]

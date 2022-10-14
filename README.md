@@ -20,6 +20,30 @@ You will have to run terraform import, e.g replace var.domain_name[0] with your 
 - `aws_s3_bucket_versioning`
 - `aws_s3_bucket_website_configuration`
 
+## Adding CSP headers
+
+X headers are returned by default, to customise the content security policy, format it in terraform and provide the full string to the variable `content_security_policy`
+
+```
+locals {
+  default-src = join(" ", ["default-src", "'none'"])
+  connect-src = join(" ", ["connect-src", "https://*.example.com"])
+  font-src = join(" ", ["font-src", "'self'"])
+  img-src = join(" ", ["img-src", "'self'"])
+  script-src = join(" ", ["script-src", "'self'"])
+  style-src = join(" ", ["style-src", "'self'", "'unsafe-inline'"])
+  object-src = join(" ", ["object-src", "'none'"])
+
+  content_security_policy = join( "; ", [local.default-src, local.connect-src, local.font-src, local.img-src, local.script-src, local.style-src, local.object-src])
+}
+
+module "cloudfront" {
+  ...
+  content_security_policy = local.content_security_policy
+  ...
+}
+```
+
 ## Requirements
 
 No requirements.
