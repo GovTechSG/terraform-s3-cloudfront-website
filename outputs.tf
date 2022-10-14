@@ -97,3 +97,15 @@ output "s3_redirec_website_endpoint" {
 output "s3_redirect_website_domain" {
   value = aws_s3_bucket.redirect.website_domain
 }
+
+output "aws_cloudfront_response_headers_policy_cors_config" {
+  value = aws_cloudfront_response_headers_policy.web_dist.cors_config
+}
+
+output "aws_cloudfront_response_headers_policy_custom_headers_config" {
+  value = aws_cloudfront_response_headers_policy.web_dist.custom_headers_config
+}
+
+output "aws_cloudfront_response_headers_policy_security_headers_config" {
+  value = aws_cloudfront_response_headers_policy.web_dist.security_headers_config
+}

@@ -91,3 +91,9 @@ variable "forward_query_string" {
   default     = false
   type        = bool
 }
+
+variable "content_security_policy" {
+  description = "Formatted CSP in string"
+  default     = "default-src 'none';"
+  type        = string
+}

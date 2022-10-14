@@ -20,6 +20,30 @@ You will have to run terraform import, e.g replace var.domain_name[0] with your 
 - `aws_s3_bucket_versioning`
 - `aws_s3_bucket_website_configuration`
 
+## Adding CSP headers
+
+X headers are returned by default, to customise the content security policy, format it in terraform and provide the full string to the variable `content_security_policy`
+
+```
+locals {
+  default-src = join(" ", ["default-src", "'none'"])
+  connect-src = join(" ", ["connect-src", "https://*.example.com"])
+  font-src = join(" ", ["font-src", "'self'"])
+  img-src = join(" ", ["img-src", "'self'"])
+  script-src = join(" ", ["script-src", "'self'"])
+  style-src = join(" ", ["style-src", "'self'", "'unsafe-inline'"])
+  object-src = join(" ", ["object-src", "'none'"])
+
+  content_security_policy = join( "; ", [local.default-src, local.connect-src, local.font-src, local.img-src, local.script-src, local.style-src, local.object-src])
+}
+
+module "cloudfront" {
+  ...
+  content_security_policy = local.content_security_policy
+  ...
+}
+```
+
 ## Requirements
 
 No requirements.
@@ -46,6 +70,7 @@ No modules.
 | [aws_cloudfront_distribution.web_dist](https://registry.terraform.io/providers/hashicorp/aws/latest/docs/resources/cloudfront_distribution) | resource |
 | [aws_cloudfront_distribution.web_redirect](https://registry.terraform.io/providers/hashicorp/aws/latest/docs/resources/cloudfront_distribution) | resource |
 | [aws_cloudfront_origin_access_identity.origin_access_identity](https://registry.terraform.io/providers/hashicorp/aws/latest/docs/resources/cloudfront_origin_access_identity) | resource |
+| [aws_cloudfront_response_headers_policy.web_dist](https://registry.terraform.io/providers/hashicorp/aws/latest/docs/resources/cloudfront_response_headers_policy) | resource |
 | [aws_iam_role.lambda_execution](https://registry.terraform.io/providers/hashicorp/aws/latest/docs/resources/iam_role) | resource |
 | [aws_iam_role_policy.lambda_execution](https://registry.terraform.io/providers/hashicorp/aws/latest/docs/resources/iam_role_policy) | resource |
 | [aws_lambda_function.redirect](https://registry.terraform.io/providers/hashicorp/aws/latest/docs/resources/lambda_function) | resource |
@@ -77,6 +102,7 @@ No modules.
 | Name | Description | Type | Default | Required |
 |------|-------------|------|---------|:--------:|
 | <a name="input_cloudfront_origin_path"></a> [cloudfront\_origin\_path](#input\_cloudfront\_origin\_path) | Origin path of CloudFront | `string` | `""` | no |
+| <a name="input_content_security_policy"></a> [content\_security\_policy](#input\_content\_security\_policy) | Formatted CSP in string | `string` | `"default-src 'none';"` | no |
 | <a name="input_cors_allowed_origins"></a> [cors\_allowed\_origins](#input\_cors\_allowed\_origins) | CORS allowed origins | `list(string)` | `[]` | no |
 | <a name="input_domain_names"></a> [domain\_names](#input\_domain\_names) | domain names to serve site on | `list(string)` | n/a | yes |
 | <a name="input_enable_acm_validation"></a> [enable\_acm\_validation](#input\_enable\_acm\_validation) | Validates ACM by updating route 53 DNS | `bool` | `false` | no |
@@ -97,6 +123,9 @@ No modules.
 
 | Name | Description |
 |------|-------------|
+| <a name="output_aws_cloudfront_response_headers_policy_cors_config"></a> [aws\_cloudfront\_response\_headers\_policy\_cors\_config](#output\_aws\_cloudfront\_response\_headers\_policy\_cors\_config) | n/a |
+| <a name="output_aws_cloudfront_response_headers_policy_custom_headers_config"></a> [aws\_cloudfront\_response\_headers\_policy\_custom\_headers\_config](#output\_aws\_cloudfront\_response\_headers\_policy\_custom\_headers\_config) | n/a |
+| <a name="output_aws_cloudfront_response_headers_policy_security_headers_config"></a> [aws\_cloudfront\_response\_headers\_policy\_security\_headers\_config](#output\_aws\_cloudfront\_response\_headers\_policy\_security\_headers\_config) | n/a |
 | <a name="output_cache_invalidation_command"></a> [cache\_invalidation\_command](#output\_cache\_invalidation\_command) | CloudFront edge cache invalidation command. /path/to/invalidation/resource is like /index.html /error.html |
 | <a name="output_cache_invalidation_redirect_command"></a> [cache\_invalidation\_redirect\_command](#output\_cache\_invalidation\_redirect\_command) | CloudFront edge cache invalidation command. /path/to/invalidation/resource is like /index.html /error.html |
 | <a name="output_cloudfront_distribution_main_arn"></a> [cloudfront\_distribution\_main\_arn](#output\_cloudfront\_distribution\_main\_arn) | ARN of cloudfront distribution |
