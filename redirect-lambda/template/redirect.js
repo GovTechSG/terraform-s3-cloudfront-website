@@ -15,10 +15,6 @@ exports.handler = (event, context, callback) => {
     status: '301',
     statusDescription: 'Moved Permanently',
     headers: {
-      "strict-transport-security": [{
-        key: 'strict-transport-security',
-        value: 'max-age=31536000; includeSubDomains'
-      }],
       location: [{
         key: 'Location',
         value: redirectTo,

@@ -17,9 +17,9 @@ resource "aws_cloudfront_response_headers_policy" "web_dist" {
     }
 
     xss_protection {
-      mode_block = true
-      override   = false
-      protection = true
+      mode_block = false
+      override   = true
+      protection = false
     }
 
     strict_transport_security {
@@ -196,6 +196,8 @@ resource "aws_cloudfront_distribution" "web_redirect" {
     cached_methods   = ["GET", "HEAD", "OPTIONS"]
     target_origin_id = local.s3_redirect_origin_id
     compress         = true
+
+    response_headers_policy_id = aws_cloudfront_response_headers_policy.web_dist.id    
 
     forwarded_values {
       query_string = var.forward_query_string
