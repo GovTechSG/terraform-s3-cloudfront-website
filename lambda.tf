@@ -6,7 +6,6 @@ resource "local_file" "redirect-template" {
   filename = "${path.module}/redirect-lambda/redirect.js"
 }
 
-
 data "archive_file" "redirect_zip" {
   depends_on = [
     local_file.redirect-template
@@ -72,7 +71,7 @@ resource "aws_lambda_function" "redirect" {
   publish          = true
   role             = aws_iam_role.lambda_execution.arn
   runtime          = "nodejs14.x"
-  tags             = {
+  tags = {
     Description = "Created by Terraform"
   }
 }

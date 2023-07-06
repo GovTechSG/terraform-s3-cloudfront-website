@@ -44,7 +44,6 @@ resource "aws_s3_bucket_versioning" "main" {
 resource "aws_s3_bucket" "redirect" {
   bucket = var.redirect_domain_names[0]
 }
-
 resource "aws_s3_bucket_acl" "redirect" {
   bucket = aws_s3_bucket.redirect.bucket
   acl    = "private"
@@ -60,6 +59,7 @@ resource "aws_s3_bucket_website_configuration" "redirect" {
 
   redirect_all_requests_to {
     host_name = var.domain_names[0]
+    protocol  = "https"
   }
 }
 

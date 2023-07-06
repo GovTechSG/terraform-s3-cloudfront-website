@@ -170,7 +170,7 @@ resource "aws_cloudfront_distribution" "web_redirect" {
   web_acl_id      = var.web_acl_id
 
   origin {
-    domain_name = aws_s3_bucket.redirect.website_endpoint
+    domain_name = aws_s3_bucket_website_configuration.redirect.website_endpoint
     origin_id   = local.s3_redirect_origin_id
     custom_origin_config {
       http_port  = 80
@@ -197,7 +197,7 @@ resource "aws_cloudfront_distribution" "web_redirect" {
     target_origin_id = local.s3_redirect_origin_id
     compress         = true
 
-    response_headers_policy_id = aws_cloudfront_response_headers_policy.web_dist.id    
+    response_headers_policy_id = aws_cloudfront_response_headers_policy.web_dist.id
 
     forwarded_values {
       query_string = var.forward_query_string
@@ -212,12 +212,6 @@ resource "aws_cloudfront_distribution" "web_redirect" {
     min_ttl                = 0
     default_ttl            = 3600
     max_ttl                = 86400
-
-    lambda_function_association {
-      event_type   = "origin-request"
-      lambda_arn   = aws_lambda_function.redirect.qualified_arn
-      include_body = true
-    }
   }
 
   restrictions {

@@ -31,8 +31,4 @@ resource "aws_route53_record" "cert_validation" {
   records = [lookup(tolist(aws_acm_certificate.cert.domain_validation_options)[count.index], "resource_record_value")]
   zone_id = var.route53_zone_id
   ttl     = 60
-
-  lifecycle {
-    ignore_changes = ["fqdn"]
-  }
 }

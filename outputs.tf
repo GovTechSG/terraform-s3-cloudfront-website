@@ -83,19 +83,19 @@ output "s3_redirect_arn" {
 }
 
 output "s3_main_website_endpoint" {
-  value = aws_s3_bucket.main.website_endpoint
+  value = aws_s3_bucket_website_configuration.main.website_endpoint
 }
 
 output "s3_main_website_domain" {
-  value = aws_s3_bucket.main.website_domain
+  value = aws_s3_bucket_website_configuration.main.website_domain
 }
 
 output "s3_redirec_website_endpoint" {
-  value = aws_s3_bucket.redirect.website_endpoint
+  value = aws_s3_bucket_website_configuration.redirect.website_endpoint
 }
 
 output "s3_redirect_website_domain" {
-  value = aws_s3_bucket.redirect.website_domain
+  value = aws_s3_bucket_website_configuration.redirect.website_domain
 }
 
 output "aws_cloudfront_response_headers_policy_cors_config" {
