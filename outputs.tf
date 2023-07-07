@@ -1,7 +1,7 @@
-// output "acm_arn" {
-//   description = "ARN of acm certificate"
-//   value = aws_acm_certificate.cert.arn
-// }
+output "acm_arn" {
+  description = "ARN of acm certificate"
+  value       = aws_acm_certificate.cert.arn
+}
 
 output "cache_invalidation_command" {
   description = "CloudFront edge cache invalidation command. /path/to/invalidation/resource is like /index.html /error.html"
@@ -51,25 +51,6 @@ output "cloudfront_distribution_redirect_etag" {
 output "cloudfront_distribution_redirect_hosted_zone_id" {
   description = "hosted zone id of cloudfront distribution"
   value       = aws_cloudfront_distribution.web_redirect.hosted_zone_id
-}
-
-
-output "cloudfront_oai_iam_arn" {
-  description = "A pre-generated ARN for use in S3 bucket policies"
-  value       = aws_cloudfront_origin_access_identity.origin_access_identity.iam_arn
-}
-
-output "cloudfront_oai_s3_canonical_user_id" {
-  value = aws_cloudfront_origin_access_identity.origin_access_identity.s3_canonical_user_id
-}
-
-output "cloudfront_oai_etag" {
-  value = aws_cloudfront_origin_access_identity.origin_access_identity.etag
-}
-
-output "cloudfront_oai_cloudfront_access_identity_path" {
-  description = "A shortcut to the full path for the origin access identity to use in CloudFront"
-  value       = aws_cloudfront_origin_access_identity.origin_access_identity.cloudfront_access_identity_path
 }
 
 output "s3_main_arn" {
