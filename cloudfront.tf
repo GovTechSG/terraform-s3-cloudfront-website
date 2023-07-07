@@ -7,6 +7,18 @@ resource "aws_cloudfront_origin_access_identity" "origin_access_identity" {
   comment = "website"
 }
 
+resource "aws_cloudfront_origin_access_identity" "origin_access_identity_redirect" {
+  comment = "website"
+}
+
+resource "aws_cloudfront_origin_access_control" "main" {
+  name                              = local.s3_origin_id
+  description                       = "${local.s3_origin_id} Policy"
+  origin_access_control_origin_type = "s3"
+  signing_behavior                  = "always"
+  signing_protocol                  = "sigv4"
+}
+
 resource "aws_cloudfront_response_headers_policy" "web_dist" {
   name = "${var.service_name}-policy"
 
@@ -55,13 +67,14 @@ resource "aws_cloudfront_distribution" "web_dist" {
   web_acl_id          = var.web_acl_id
 
   origin {
-    domain_name = aws_s3_bucket.main.bucket_regional_domain_name
-    origin_id   = local.s3_origin_id
-    origin_path = var.cloudfront_origin_path
+    domain_name              = aws_s3_bucket.main.bucket_regional_domain_name
+    origin_id                = local.s3_origin_id
+    origin_path              = var.cloudfront_origin_path
+    origin_access_control_id = aws_cloudfront_origin_access_control.main.id
 
-    s3_origin_config {
-      origin_access_identity = aws_cloudfront_origin_access_identity.origin_access_identity.cloudfront_access_identity_path
-    }
+    # s3_origin_config {
+    #   origin_access_identity = aws_cloudfront_origin_access_identity.origin_access_identity.cloudfront_access_identity_path
+    # }
   }
 
   # SPA
@@ -159,8 +172,6 @@ resource "aws_cloudfront_distribution" "web_dist" {
   }
 }
 
-
-
 resource "aws_cloudfront_distribution" "web_redirect" {
   enabled         = true
   is_ipv6_enabled = true
@@ -172,11 +183,11 @@ resource "aws_cloudfront_distribution" "web_redirect" {
   origin {
     domain_name = aws_s3_bucket_website_configuration.redirect.website_endpoint
     origin_id   = local.s3_redirect_origin_id
-    custom_origin_config {
-      http_port  = 80
-      https_port = 80
 
-      origin_protocol_policy = "match-viewer"
+    custom_origin_config {
+      http_port              = 80
+      https_port             = 443
+      origin_protocol_policy = "http-only"
       origin_ssl_protocols   = ["TLSv1.2"]
     }
   }

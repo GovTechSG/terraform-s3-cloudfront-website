@@ -1,3 +1,5 @@
+data "aws_caller_identity" "current" {}
+
 resource "aws_s3_bucket" "main" {
   bucket = var.domain_names[0]
   // acl = "private"
@@ -87,8 +89,24 @@ resource "aws_s3_bucket_versioning" "redirect" {
 }
 
 data "aws_iam_policy_document" "bucket_policy" {
+  # statement {
+  #   sid    = "AllowCloudFront"
+  #   effect = "Allow"
+  #   actions = [
+  #     "s3:GetObject"
+  #   ]
+  #   resources = [
+  #     "arn:aws:s3:::${var.domain_names[0]}/*"
+  #   ]
+
+  #   principals {
+  #     type        = "AWS"
+  #     identifiers = ["arn:aws:iam::cloudfront:user/CloudFront Origin Access Identity ${aws_cloudfront_origin_access_identity.origin_access_identity.id}"]
+  #   }
+  # }
+
   statement {
-    sid    = "AllowCloudFront"
+    sid    = "AllowCloudFrontServicePrincipalReadOnly"
     effect = "Allow"
     actions = [
       "s3:GetObject"
@@ -96,10 +114,15 @@ data "aws_iam_policy_document" "bucket_policy" {
     resources = [
       "arn:aws:s3:::${var.domain_names[0]}/*"
     ]
-
     principals {
-      type        = "AWS"
-      identifiers = ["arn:aws:iam::cloudfront:user/CloudFront Origin Access Identity ${aws_cloudfront_origin_access_identity.origin_access_identity.id}"]
+      type        = "Service"
+      identifiers = ["cloudfront.amazonaws.com"]
+    }
+
+    condition {
+      test     = "StringEquals"
+      variable = "AWS:SourceArn"
+      values   = ["arn:aws:cloudfront::${data.aws_caller_identity.current.account_id}:distribution/${aws_cloudfront_distribution.web_dist.id}"]
     }
   }
 
@@ -131,21 +154,26 @@ data "aws_iam_policy_document" "bucket_policy" {
 }
 
 data "aws_iam_policy_document" "bucket_policy_redirect" {
-  statement {
-    sid    = "AllowCloudFront"
-    effect = "Allow"
-    actions = [
-      "s3:GetObject"
-    ]
-    resources = [
-      "arn:aws:s3:::${var.redirect_domain_names[0]}/*"
-    ]
+  # statement {
+  #   sid    = "AllowCloudFrontServicePrincipalReadOnly"
+  #   effect = "Allow"
+  #   actions = [
+  #     "s3:GetObject"
+  #   ]
+  #   resources = [
+  #     "arn:aws:s3:::${var.redirect_domain_names[0]}/*"
+  #   ]
+  #   principals {
+  #     type        = "Service"
+  #     identifiers = ["cloudfront.amazonaws.com"]
+  #   }
 
-    principals {
-      type        = "AWS"
-      identifiers = ["arn:aws:iam::cloudfront:user/CloudFront Origin Access Identity ${aws_cloudfront_origin_access_identity.origin_access_identity.id}"]
-    }
-  }
+  #   condition {
+  #     test     = "StringEquals"
+  #     variable = "AWS:SourceArn"
+  #     values   = ["arn:aws:cloudfront::${data.aws_caller_identity.current.account_id}:distribution/${aws_cloudfront_distribution.web_redirect.id}"]
+  #   }
+  # }
 
   statement {
     sid = "https-only"
@@ -204,4 +232,19 @@ resource "aws_s3_bucket_public_access_block" "public_access_block_main" {
 
   # Retroactivley block public and cross-account access if bucket has public policies
   restrict_public_buckets = true
+}
+
+resource "aws_s3_bucket_cors_configuration" "main" {
+  bucket = aws_s3_bucket.main.id
+
+  cors_rule {
+    allowed_headers = [
+      "Authorization",
+      "Content-Length"
+    ]
+    allowed_methods = ["GET"]
+    allowed_origins = ["*"]
+    expose_headers  = []
+    max_age_seconds = 3000
+  }
 }
