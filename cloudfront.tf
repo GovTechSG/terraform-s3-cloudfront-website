@@ -3,11 +3,8 @@ locals {
   s3_redirect_origin_id = "${var.redirect_domain_names[0]}${var.cloudfront_origin_path}"
 }
 
+# Unused, to be removed in future commits as it requires the migration the OAC to be completed first
 resource "aws_cloudfront_origin_access_identity" "origin_access_identity" {
-  comment = "website"
-}
-
-resource "aws_cloudfront_origin_access_identity" "origin_access_identity_redirect" {
   comment = "website"
 }
 
@@ -71,10 +68,6 @@ resource "aws_cloudfront_distribution" "web_dist" {
     origin_id                = local.s3_origin_id
     origin_path              = var.cloudfront_origin_path
     origin_access_control_id = aws_cloudfront_origin_access_control.main.id
-
-    # s3_origin_config {
-    #   origin_access_identity = aws_cloudfront_origin_access_identity.origin_access_identity.cloudfront_access_identity_path
-    # }
   }
 
   # SPA

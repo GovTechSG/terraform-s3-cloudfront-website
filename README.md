@@ -47,9 +47,12 @@ module "cloudfront" {
   ...
 }
 ```
+
 ## Requirements
 
-No requirements.
+| Name | Version |
+|------|---------|
+| <a name="requirement_local"></a> [local](#requirement\_local) | ~> 2.1 |
 
 ## Providers
 
@@ -71,8 +74,6 @@ No modules.
 | [aws_cloudfront_distribution.web_dist](https://registry.terraform.io/providers/hashicorp/aws/latest/docs/resources/cloudfront_distribution) | resource |
 | [aws_cloudfront_distribution.web_redirect](https://registry.terraform.io/providers/hashicorp/aws/latest/docs/resources/cloudfront_distribution) | resource |
 | [aws_cloudfront_origin_access_control.main](https://registry.terraform.io/providers/hashicorp/aws/latest/docs/resources/cloudfront_origin_access_control) | resource |
-| [aws_cloudfront_origin_access_identity.origin_access_identity](https://registry.terraform.io/providers/hashicorp/aws/latest/docs/resources/cloudfront_origin_access_identity) | resource |
-| [aws_cloudfront_origin_access_identity.origin_access_identity_redirect](https://registry.terraform.io/providers/hashicorp/aws/latest/docs/resources/cloudfront_origin_access_identity) | resource |
 | [aws_cloudfront_response_headers_policy.web_dist](https://registry.terraform.io/providers/hashicorp/aws/latest/docs/resources/cloudfront_response_headers_policy) | resource |
 | [aws_route53_record.cert_validation](https://registry.terraform.io/providers/hashicorp/aws/latest/docs/resources/route53_record) | resource |
 | [aws_route53_record.redirect](https://registry.terraform.io/providers/hashicorp/aws/latest/docs/resources/route53_record) | resource |
@@ -123,6 +124,7 @@ No modules.
 
 | Name | Description |
 |------|-------------|
+| <a name="output_acm_arn"></a> [acm\_arn](#output\_acm\_arn) | ARN of acm certificate |
 | <a name="output_aws_cloudfront_response_headers_policy_cors_config"></a> [aws\_cloudfront\_response\_headers\_policy\_cors\_config](#output\_aws\_cloudfront\_response\_headers\_policy\_cors\_config) | n/a |
 | <a name="output_aws_cloudfront_response_headers_policy_custom_headers_config"></a> [aws\_cloudfront\_response\_headers\_policy\_custom\_headers\_config](#output\_aws\_cloudfront\_response\_headers\_policy\_custom\_headers\_config) | n/a |
 | <a name="output_aws_cloudfront_response_headers_policy_security_headers_config"></a> [aws\_cloudfront\_response\_headers\_policy\_security\_headers\_config](#output\_aws\_cloudfront\_response\_headers\_policy\_security\_headers\_config) | n/a |
@@ -136,10 +138,6 @@ No modules.
 | <a name="output_cloudfront_distribution_redirect_domain_name"></a> [cloudfront\_distribution\_redirect\_domain\_name](#output\_cloudfront\_distribution\_redirect\_domain\_name) | Domain URL of cloudfront distribution |
 | <a name="output_cloudfront_distribution_redirect_etag"></a> [cloudfront\_distribution\_redirect\_etag](#output\_cloudfront\_distribution\_redirect\_etag) | ETag of cloudfront distribution |
 | <a name="output_cloudfront_distribution_redirect_hosted_zone_id"></a> [cloudfront\_distribution\_redirect\_hosted\_zone\_id](#output\_cloudfront\_distribution\_redirect\_hosted\_zone\_id) | hosted zone id of cloudfront distribution |
-| <a name="output_cloudfront_oai_cloudfront_access_identity_path"></a> [cloudfront\_oai\_cloudfront\_access\_identity\_path](#output\_cloudfront\_oai\_cloudfront\_access\_identity\_path) | A shortcut to the full path for the origin access identity to use in CloudFront |
-| <a name="output_cloudfront_oai_etag"></a> [cloudfront\_oai\_etag](#output\_cloudfront\_oai\_etag) | n/a |
-| <a name="output_cloudfront_oai_iam_arn"></a> [cloudfront\_oai\_iam\_arn](#output\_cloudfront\_oai\_iam\_arn) | A pre-generated ARN for use in S3 bucket policies |
-| <a name="output_cloudfront_oai_s3_canonical_user_id"></a> [cloudfront\_oai\_s3\_canonical\_user\_id](#output\_cloudfront\_oai\_s3\_canonical\_user\_id) | n/a |
 | <a name="output_s3_main_arn"></a> [s3\_main\_arn](#output\_s3\_main\_arn) | ARN of s3 hosting index.html of site |
 | <a name="output_s3_main_website_domain"></a> [s3\_main\_website\_domain](#output\_s3\_main\_website\_domain) | n/a |
 | <a name="output_s3_main_website_endpoint"></a> [s3\_main\_website\_endpoint](#output\_s3\_main\_website\_endpoint) | n/a |
