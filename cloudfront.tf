@@ -91,7 +91,7 @@ resource "aws_cloudfront_distribution" "web_dist" {
     allowed_methods            = ["GET", "HEAD", "OPTIONS"]
     cached_methods             = ["GET", "HEAD", "OPTIONS"]
     target_origin_id           = local.s3_origin_id
-    compress                   = true
+    compress                   = var.enable_compression
     response_headers_policy_id = aws_cloudfront_response_headers_policy.web_dist.id
 
     forwarded_values {
@@ -199,7 +199,7 @@ resource "aws_cloudfront_distribution" "web_redirect" {
     allowed_methods  = ["GET", "HEAD", "OPTIONS"]
     cached_methods   = ["GET", "HEAD", "OPTIONS"]
     target_origin_id = local.s3_redirect_origin_id
-    compress         = true
+    compress         = var.enable_compression
 
     response_headers_policy_id = aws_cloudfront_response_headers_policy.web_dist.id
 

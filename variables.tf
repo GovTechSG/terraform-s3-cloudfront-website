@@ -97,3 +97,9 @@ variable "content_security_policy" {
   default     = "default-src 'none';"
   type        = string
 }
+
+variable "enable_compression" {
+  description = "Toggle whether the default cache behaviour has compression enabled"
+  default     = true
+  type        = bool
+}
