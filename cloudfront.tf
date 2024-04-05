@@ -19,6 +19,24 @@ resource "aws_cloudfront_origin_access_control" "main" {
 resource "aws_cloudfront_response_headers_policy" "web_dist" {
   name = "${var.service_name}-policy"
 
+  cors_config {
+    access_control_allow_credentials = false
+
+    access_control_allow_headers {
+      items = ["*"]
+    }
+
+    access_control_allow_methods {
+      items = ["GET", "HEAD", "POST", "OPTIONS"]
+    }
+
+    access_control_allow_origins {
+      items = var.cors_allowed_origins
+    }
+
+    origin_override = true
+  }
+
   security_headers_config {
     content_security_policy {
       content_security_policy = var.content_security_policy
