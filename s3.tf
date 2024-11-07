@@ -2,7 +2,6 @@ data "aws_caller_identity" "current" {}
 
 resource "aws_s3_bucket" "main" {
   bucket = var.domain_names[0]
-  // acl = "private"
 }
 resource "aws_s3_bucket_policy" "main" {
   bucket = aws_s3_bucket.main.bucket
@@ -29,6 +28,17 @@ resource "aws_s3_bucket_server_side_encryption_configuration" "main" {
   }
 }
 
+resource "aws_s3_bucket_ownership_controls" "main" {
+  bucket = aws_s3_bucket.main.bucket
+  depends_on = [
+    aws_s3_bucket.main
+  ]
+
+  rule {
+    object_ownership = "BucketOwnerEnforced"
+  }
+}
+
 resource "aws_s3_bucket_logging" "main" {
   bucket = aws_s3_bucket.main.bucket
 
@@ -45,10 +55,6 @@ resource "aws_s3_bucket_versioning" "main" {
 
 resource "aws_s3_bucket" "redirect" {
   bucket = var.redirect_domain_names[0]
-}
-resource "aws_s3_bucket_acl" "redirect" {
-  bucket = aws_s3_bucket.redirect.bucket
-  acl    = "private"
 }
 
 resource "aws_s3_bucket_policy" "redirect" {
@@ -71,6 +77,17 @@ resource "aws_s3_bucket_server_side_encryption_configuration" "redirect" {
     apply_server_side_encryption_by_default {
       sse_algorithm = "AES256"
     }
+  }
+}
+
+resource "aws_s3_bucket_ownership_controls" "redirect" {
+  bucket = aws_s3_bucket.redirect.bucket
+  depends_on = [
+    aws_s3_bucket.redirect
+  ]
+
+  rule {
+    object_ownership = "BucketOwnerEnforced"
   }
 }
 
