@@ -88,11 +88,16 @@ resource "aws_cloudfront_distribution" "web_dist" {
     origin_access_control_id = aws_cloudfront_origin_access_control.main.id
   }
 
-  # SPA
-  custom_error_response {
-    error_code         = 403
-    response_code      = 200
-    response_page_path = "/index.html"
+  # Error handling using dynamic block
+  dynamic "custom_error_response" {
+    for_each = var.custom_error_response
+
+    content {
+      error_caching_min_ttl = lookup(custom_error_response.value, "error_caching_min_ttl", null)
+      error_code            = lookup(custom_error_response.value, "error_code", null)
+      response_code         = lookup(custom_error_response.value, "response_code", null)
+      response_page_path    = lookup(custom_error_response.value, "response_page_path", null)
+    }
   }
 
   dynamic "logging_config" {

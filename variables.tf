@@ -103,3 +103,81 @@ variable "enable_compression" {
   default     = true
   type        = bool
 }
+
+variable "custom_error_response" {
+  description = "List of custom error response configurations for CloudFront distribution"
+  type = list(object({
+    error_caching_min_ttl = optional(number)
+    error_code            = number
+    response_code         = optional(number)
+    response_page_path    = optional(string)
+  }))
+  default = [
+    {
+      error_code         = 400
+      response_code      = 200
+      response_page_path = "/index.html"
+      error_caching_min_ttl = 0
+    },
+    {
+      error_code         = 403
+      response_code      = 200
+      response_page_path = "/index.html"
+      error_caching_min_ttl = 0
+    },
+    {
+      error_code         = 404
+      response_code      = 200
+      response_page_path = "/index.html"
+      error_caching_min_ttl = 0
+    },
+    {
+      error_code         = 405
+      response_code      = 200
+      response_page_path = "/index.html"
+      error_caching_min_ttl = 0
+    },
+    {
+      error_code         = 414
+      response_code      = 200
+      response_page_path = "/index.html"
+      error_caching_min_ttl = 0
+    },
+    {
+      error_code         = 416
+      response_code      = 200
+      response_page_path = "/index.html"
+      error_caching_min_ttl = 0
+    },
+    {
+      error_code         = 500
+      response_code      = 200
+      response_page_path = "/index.html"
+      error_caching_min_ttl = 0
+    },
+    {
+      error_code         = 501
+      response_code      = 200
+      response_page_path = "/index.html"
+      error_caching_min_ttl = 0
+    },
+    {
+      error_code         = 502
+      response_code      = 200
+      response_page_path = "/index.html"
+      error_caching_min_ttl = 0
+    },
+    {
+      error_code         = 503
+      response_code      = 200
+      response_page_path = "/index.html"
+      error_caching_min_ttl = 0
+    },
+    {
+      error_code         = 504
+      response_code      = 200
+      response_page_path = "/index.html"
+      error_caching_min_ttl = 0
+    }
+  ]
+}
