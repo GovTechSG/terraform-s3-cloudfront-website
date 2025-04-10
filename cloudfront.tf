@@ -1,6 +1,15 @@
 locals {
   s3_origin_id          = "${var.domain_names[0]}${var.cloudfront_origin_path}"
   s3_redirect_origin_id = "${var.redirect_domain_names[0]}${var.cloudfront_origin_path}"
+
+  # Merge user-provided Lambda functions with the nonce injector
+  # Our nonce injector takes precedence over any user-provided functions
+  lambda_function_associations = merge(
+    {
+      "origin-request" = aws_lambda_function.nonce_injector.qualified_arn
+    },
+    var.lambda_function_associations
+  )
 }
 
 # Unused, to be removed in future commits as it requires the migration the OAC to be completed first
@@ -127,7 +136,7 @@ resource "aws_cloudfront_distribution" "web_dist" {
     max_ttl                = 86400
 
     dynamic "lambda_function_association" {
-      for_each = var.lambda_function_associations
+      for_each = local.lambda_function_associations
       content {
         event_type = lambda_function_association.key
         lambda_arn = lambda_function_association.value

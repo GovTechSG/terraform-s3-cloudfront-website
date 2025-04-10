@@ -36,7 +36,7 @@ variable "save_access_log" {
 }
 
 variable "lambda_function_associations" {
-  description = "CloudFront Lambda function associations. key is CloudFront event type and value is lambda function ARN with version"
+  description = "CloudFront Lambda function associations. key is CloudFront event type and value is lambda function ARN with version. For nonce injection, this is automatically populated with the nonce-injector Lambda."
   type        = map(string)
   default     = {}
 }
