@@ -1,6 +1,32 @@
 locals {
   s3_origin_id          = "${var.domain_names[0]}${var.cloudfront_origin_path}"
   s3_redirect_origin_id = "${var.redirect_domain_names[0]}${var.cloudfront_origin_path}"
+
+  # Merge user-provided Lambda functions with our functions if nonce is enabled
+  # Our functions take precedence over any user-provided functions
+  lambda_function_associations = var.enable_nonce ? merge(
+    {
+      "origin-request" = {
+        arn = aws_lambda_function.nonce_injector[0].qualified_arn
+        include_body = true
+      }
+    },
+    var.lambda_function_associations
+  ) : var.lambda_function_associations
+
+  # Default cache behavior settings
+  default_cache_behavior_settings = {
+    allowed_methods            = ["GET", "HEAD", "OPTIONS"]
+    cached_methods             = ["GET", "HEAD", "OPTIONS"]
+    compress                   = var.enable_compression
+    default_ttl                = var.main_default_ttl
+    min_ttl                    = 0
+    max_ttl                    = 86400
+    viewer_protocol_policy     = "redirect-to-https"
+    forward_query_string       = var.forward_query_string
+    forward_headers           = ["Origin", "Access-Control-Request-Method", "Access-Control-Request-Headers"]
+    forward_cookies           = "none"
+  }
 }
 
 # Unused, to be removed in future commits as it requires the migration the OAC to be completed first
@@ -86,6 +112,11 @@ resource "aws_cloudfront_distribution" "web_dist" {
     origin_id                = local.s3_origin_id
     origin_path              = var.cloudfront_origin_path
     origin_access_control_id = aws_cloudfront_origin_access_control.main.id
+
+    custom_header {
+      name  = "x-csp"
+      value = var.content_security_policy
+    }
   }
 
   # SPA
@@ -106,31 +137,32 @@ resource "aws_cloudfront_distribution" "web_dist" {
   }
 
   default_cache_behavior {
-    allowed_methods            = ["GET", "HEAD", "OPTIONS"]
-    cached_methods             = ["GET", "HEAD", "OPTIONS"]
+    allowed_methods            = local.default_cache_behavior_settings.allowed_methods
+    cached_methods             = local.default_cache_behavior_settings.cached_methods
     target_origin_id           = local.s3_origin_id
-    compress                   = var.enable_compression
+    compress                   = local.default_cache_behavior_settings.compress
     response_headers_policy_id = aws_cloudfront_response_headers_policy.web_dist.id
 
     forwarded_values {
-      query_string = var.forward_query_string
-      headers      = ["Origin", "Access-Control-Request-Method", "Access-Control-Request-Headers"]
+      query_string = local.default_cache_behavior_settings.forward_query_string
+      headers      = local.default_cache_behavior_settings.forward_headers
 
       cookies {
-        forward = "none"
+        forward = local.default_cache_behavior_settings.forward_cookies
       }
     }
 
-    viewer_protocol_policy = "redirect-to-https"
-    min_ttl                = 0
-    default_ttl            = var.main_default_ttl
-    max_ttl                = 86400
+    viewer_protocol_policy = local.default_cache_behavior_settings.viewer_protocol_policy
+    min_ttl                = local.default_cache_behavior_settings.min_ttl
+    default_ttl            = local.default_cache_behavior_settings.default_ttl
+    max_ttl                = local.default_cache_behavior_settings.max_ttl
 
     dynamic "lambda_function_association" {
-      for_each = var.lambda_function_associations
+      for_each = local.lambda_function_associations
       content {
-        event_type = lambda_function_association.key
-        lambda_arn = lambda_function_association.value
+        event_type   = lambda_function_association.key
+        lambda_arn   = lambda_function_association.value.arn
+        include_body = lambda_function_association.value.include_body
       }
     }
   }
@@ -159,12 +191,13 @@ resource "aws_cloudfront_distribution" "web_dist" {
       default_ttl = var.main_default_ttl
       max_ttl     = 86400
 
-      dynamic "function_association" {
-        for_each = behavior.value["function-associations"]
+      dynamic "lambda_function_association" {
+        for_each = behavior.value["lambda_function_associations"]
         iterator = func
         content {
           event_type   = func.key
-          function_arn = func.value
+          lambda_arn = func.value.arn
+          include_body = func.value.include_body
         }
       }
     }

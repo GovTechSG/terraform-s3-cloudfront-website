@@ -1,0 +1,9 @@
+{
+  "name": "nonce-injector",
+  "version": "1.0.0",
+  "description": "Lambda@Edge function to inject nonces for CSP",
+  "main": "index.js",
+  "dependencies": {
+    "@aws-sdk/client-s3": "^3.0.0"
+  }
+}
