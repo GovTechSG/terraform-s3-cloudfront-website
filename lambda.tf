@@ -1,5 +1,6 @@
 # Install dependencies and create archive
 resource "null_resource" "nonce_injector_deps" {
+  count = var.enable_nonce ? 1 : 0
   triggers = {
     package_json = filemd5("${path.module}/lambda/nonce-injector/package.json")
     source_code  = filemd5("${path.module}/lambda/nonce-injector/index.js")
@@ -16,6 +17,7 @@ resource "null_resource" "nonce_injector_deps" {
 }
 
 data "archive_file" "nonce_injector" {
+  count = var.enable_nonce ? 1 : 0
   type        = "zip"
   source_dir  = "${path.module}/lambda/nonce-injector"
   output_path = "${path.module}/lambda/nonce-injector.zip"
@@ -72,12 +74,13 @@ resource "aws_iam_role_policy" "lambda_edge_s3" {
 }
 
 resource "aws_lambda_function" "nonce_injector" {
+  count = var.enable_nonce ? 1 : 0
   provider         = aws.us-east-1  # Lambda@Edge must be in us-east-1
-  filename         = data.archive_file.nonce_injector.output_path
+  filename         = data.archive_file.nonce_injector[0].output_path
   function_name    = "${var.service_name}-nonce-injector-new"
   role            = aws_iam_role.lambda_edge.arn
   handler         = "index.handler"
-  source_code_hash = data.archive_file.nonce_injector.output_base64sha256
+  source_code_hash = data.archive_file.nonce_injector[0].output_base64sha256
   runtime         = "nodejs20.x"
   publish         = true  # Required for Lambda@Edge
 
@@ -87,6 +90,7 @@ resource "aws_lambda_function" "nonce_injector" {
 
 resource "aws_cloudwatch_log_group" "nonce_injector" {
   provider = aws.us-east-1  # Must be in the same region as the Lambda function
-  name              = "/aws/lambda/us-east-1.${aws_lambda_function.nonce_injector.function_name}"
+  count             = var.enable_nonce ? 1 : 0
+  name              = "/aws/lambda/us-east-1.${aws_lambda_function.nonce_injector[0].function_name}"
   retention_in_days = 14  # Retain logs for 14 days
 }

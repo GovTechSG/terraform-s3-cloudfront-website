@@ -98,6 +98,12 @@ variable "forward_query_string" {
   type        = bool
 }
 
+variable "enable_nonce" {
+  description = "Enable nonce injection for Content Security Policy"
+  type        = bool
+  default     = false
+}
+
 variable "content_security_policy" {
   description = "Default Content Security Policy to use when no custom CSP is provided in request headers"
   default     = "default-src 'none'; img-src 'self'; script-src 'self' 'nonce-%%{SCRIPT_NONCE}%%'; style-src 'self' 'nonce-%%{STYLE_NONCE}%%'; object-src 'none'"

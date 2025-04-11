@@ -26,7 +26,22 @@ In order to remove the lambda redirection and fully rely on cloudfront and s3 to
 
 ## Adding CSP headers
 
+### Basic CSP Configuration
+
 X headers are returned by default, to customise the content security policy, format it in terraform and provide the full string to the variable `content_security_policy`
+
+### Experimental: CSP with Nonce Support
+
+This module includes an experimental feature to inject nonces into your Content Security Policy and HTML content. This is useful when you need to use inline scripts or styles while maintaining a strict CSP. To enable this feature:
+
+1. Set `enable_nonce = true` in your module configuration
+2. Ensure your CSP includes the placeholders `'nonce-%%{SCRIPT_NONCE}%%'` and `'nonce-%%{STYLE_NONCE}%%'` where needed
+
+**Important Limitations:**
+- This feature is experimental and should only be enabled if you specifically need nonce support in your CSP
+- Nonces cannot be automatically injected into dynamically loaded content (e.g., JavaScript-injected scripts or styles)
+- The feature uses Lambda@Edge which may add latency to your requests
+- Only works with HTML files and requires proper Content-Type headers
 
 ```
 locals {
@@ -104,6 +119,7 @@ No modules.
 |------|-------------|------|---------|:--------:|
 | <a name="input_cloudfront_origin_path"></a> [cloudfront\_origin\_path](#input\_cloudfront\_origin\_path) | Origin path of CloudFront | `string` | `""` | no |
 | <a name="input_content_security_policy"></a> [content\_security\_policy](#input\_content\_security\_policy) | Formatted CSP in string | `string` | `"default-src 'none';"` | no |
+| <a name="input_enable_nonce"></a> [enable\_nonce](#input\_enable\_nonce) | Enable experimental nonce injection for Content Security Policy | `bool` | `false` | no |
 | <a name="input_cors_allowed_origins"></a> [cors\_allowed\_origins](#input\_cors\_allowed\_origins) | CORS allowed origins | `list(string)` | `[]` | no |
 | <a name="input_domain_names"></a> [domain\_names](#input\_domain\_names) | domain names to serve site on | `list(string)` | n/a | yes |
 | <a name="input_enable_acm_validation"></a> [enable\_acm\_validation](#input\_enable\_acm\_validation) | Validates ACM by updating route 53 DNS | `bool` | `false` | no |

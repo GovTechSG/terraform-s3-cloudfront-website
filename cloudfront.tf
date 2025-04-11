@@ -2,17 +2,17 @@ locals {
   s3_origin_id          = "${var.domain_names[0]}${var.cloudfront_origin_path}"
   s3_redirect_origin_id = "${var.redirect_domain_names[0]}${var.cloudfront_origin_path}"
 
-  # Merge user-provided Lambda functions with our functions
+  # Merge user-provided Lambda functions with our functions if nonce is enabled
   # Our functions take precedence over any user-provided functions
-  lambda_function_associations = merge(
+  lambda_function_associations = var.enable_nonce ? merge(
     {
       "origin-request" = {
-        arn = aws_lambda_function.nonce_injector.qualified_arn
+        arn = aws_lambda_function.nonce_injector[0].qualified_arn
         include_body = true
       }
     },
     var.lambda_function_associations
-  )
+  ) : var.lambda_function_associations
 
   # Default cache behavior settings
   default_cache_behavior_settings = {
