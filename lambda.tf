@@ -11,6 +11,8 @@ resource "null_resource" "nonce_injector_deps" {
       npm install --production
     EOT
   }
+
+
 }
 
 data "archive_file" "nonce_injector" {
@@ -85,6 +87,6 @@ resource "aws_lambda_function" "nonce_injector" {
 
 resource "aws_cloudwatch_log_group" "nonce_injector" {
   provider = aws.us-east-1  # Must be in the same region as the Lambda function
-  name              = "/aws/lambda/${aws_lambda_function.nonce_injector.function_name}"
+  name              = "/aws/lambda/us-east-1.${aws_lambda_function.nonce_injector.function_name}"
   retention_in_days = 14  # Retain logs for 14 days
 }

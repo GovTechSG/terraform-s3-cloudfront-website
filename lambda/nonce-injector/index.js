@@ -1,6 +1,6 @@
 'use strict';
-import { randomBytes } from "crypto";
-import { GetObjectCommand, S3Client } from "@aws-sdk/client-s3";
+const { randomBytes } = require("crypto");
+const { GetObjectCommand, S3Client } = require("@aws-sdk/client-s3");
 
 /** @type{S3Client} */
 let s3Client;
@@ -22,6 +22,7 @@ async function getIndex(bucket, region) {
   const etag = CACHE && CACHE.etag || null;
   try {
     if (CACHE) {
+      console.log(CACHE);
       if (CACHE.date < new Date()) {
         // A refresh is needed
         refresh = true;
@@ -109,10 +110,9 @@ function rewriteCsp(contentSecurityPolicy, nonce) {
   return contentSecurityPolicy;
 }
 
-export const handler = async (event) => {
-  //Get contents of response
-  const request = event.Records[0].cf.request;
+exports.handler = async (event) => {
   console.log('Event received:', JSON.stringify(event, null, 2));
+  const request = event.Records[0].cf.request;
 
   let rewrite = false;
   /** @type {string} */
@@ -126,8 +126,10 @@ export const handler = async (event) => {
     rewrite = true;
   }
 
-  let [bucket,,region] =
-    request.origin.s3.domainName.split('.', 3);
+  const domainParts = request.origin.s3.domainName.split('.');
+  const s3Index = domainParts.indexOf('s3');
+  const bucket = domainParts.slice(0, s3Index).join('.');
+  const region = domainParts[s3Index + 1];
 
   if (rewrite && bucket) {
     const nonce = randomBytes(16)
@@ -149,12 +151,14 @@ export const handler = async (event) => {
     }
 
     contentSecurityPolicy =
-      rewriteCsp(contentSecurityPolicy, nonce);
+    rewriteCsp(contentSecurityPolicy, nonce);
+    console.log(contentSecurityPolicy);
 
     if (html) {
       html = html
         .replaceAll('<script', `<script nonce="${nonce}"`)
         .replaceAll('<style', `<style nonce="${nonce}"`)
+        .replaceAll('<link', `<link nonce="${nonce}"`)
         // This is specific to an angular app with a root element
         // of "app-root"
         .replaceAll('<app-root', `<app-root ngCspNonce="${nonce}"`);
@@ -172,6 +176,8 @@ export const handler = async (event) => {
         key: 'Content-Security-Policy',
         value: contentSecurityPolicy
       }];
+
+      console.log("Including nonce: ", html);
       // Set the response body with the nonce-ified html
       const response = {
         status: 200,

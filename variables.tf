@@ -36,9 +36,12 @@ variable "save_access_log" {
 }
 
 variable "lambda_function_associations" {
-  description = "CloudFront Lambda function associations. key is CloudFront event type and value is lambda function ARN with version. For nonce injection, this is automatically populated with the nonce-injector Lambda."
-  type        = map(string)
-  default     = {}
+  description = "CloudFront Lambda function associations. key is CloudFront event type and value is an object with 'arn' (Lambda function ARN with version) and 'include_body' (whether to include request/response body) fields. For nonce injection, this is automatically populated with the nonce-injector Lambda."
+  type = map(object({
+    arn = string
+    include_body = bool
+  }))
+  default = {}
 }
 
 variable "cors_allowed_origins" {
@@ -78,11 +81,14 @@ variable "web_acl_id" {
 }
 
 variable "ordered_cache_behaviors" {
-  description = ""
+  description = "Ordered cache behaviors with Lambda function associations"
   default     = []
   type = list(object({
     path                  = string
-    function-associations = map(string)
+    lambda_function_associations = map(object({
+      arn = string
+      include_body = bool
+    }))
   }))
 }
 
@@ -93,8 +99,8 @@ variable "forward_query_string" {
 }
 
 variable "content_security_policy" {
-  description = "Formatted CSP in string"
-  default     = "default-src 'none';"
+  description = "Default Content Security Policy to use when no custom CSP is provided in request headers"
+  default     = "default-src 'none'; img-src 'self'; script-src 'self' 'nonce-%%{SCRIPT_NONCE}%%'; style-src 'self' 'nonce-%%{STYLE_NONCE}%%'; object-src 'none'"
   type        = string
 }
 
