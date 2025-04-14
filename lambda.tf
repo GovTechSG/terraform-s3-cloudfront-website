@@ -77,7 +77,7 @@ resource "aws_lambda_function" "nonce_injector" {
   count = var.enable_nonce ? 1 : 0
   provider         = aws.us-east-1  # Lambda@Edge must be in us-east-1
   filename         = data.archive_file.nonce_injector[0].output_path
-  function_name    = "${var.service_name}-nonce-injector-new"
+  function_name    = "${var.service_name}-nonce-injector"
   role            = aws_iam_role.lambda_edge.arn
   handler         = "index.handler"
   source_code_hash = data.archive_file.nonce_injector[0].output_base64sha256
