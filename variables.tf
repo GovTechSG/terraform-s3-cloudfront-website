@@ -68,9 +68,27 @@ variable "permissions_boundary" {
   default     = ""
 }
 
+variable "enable_ttl" {
+  description = "Enable TTL settings for CloudFront cache. If false, uses origin cache settings."
+  type        = bool
+  default     = false
+}
+
 variable "main_default_ttl" {
-  description = "default TTL of the main cloudfront distribution"
-  default     = 180
+  description = "Default TTL of the main cloudfront distribution. Only used if enable_ttl is true."
+  default     = null
+  type        = number
+}
+
+variable "main_min_ttl" {
+  description = "Minimum TTL of the main cloudfront distribution. Only used if enable_ttl is true."
+  default     = null
+  type        = number
+}
+
+variable "main_max_ttl" {
+  description = "Maximum TTL of the main cloudfront distribution. Only used if enable_ttl is true."
+  default     = null
   type        = number
 }
 
