@@ -8,6 +8,10 @@ let s3Client;
 /** @type{{contents: string, etag: string, date: Date} | null} */
 let CACHE = null;
 
+// Get config from template variables
+const injectScriptNonces = ${inject_script_nonces};
+const injectStyleNonces = ${inject_style_nonces};
+
 /**
 * Fetches and caches index.html
 * @param {string} bucket
@@ -71,15 +75,13 @@ async function getIndex(bucket, region) {
 * Rewrites Content Security Policy with nonce
 * @param {string | null} contentSecurityPolicy
 * @param {string} nonce
+* @param {object} request
 * @returns {string}
 */
-function rewriteCsp(contentSecurityPolicy, nonce) {
-  if (!contentSecurityPolicy) {
-    // Have a sane default if misconfigured
-    contentSecurityPolicy =
-      "default-src 'none'; img-src 'self'; script-src 'self'; style-src 'self'; object-src 'none'";
-  }
+function rewriteCsp(contentSecurityPolicy, nonce, request) {
+  if (!contentSecurityPolicy) return contentSecurityPolicy;
   try {
+
     // Disassemble the content security policy set up in CDK
     const policies = contentSecurityPolicy.split(';');
     for (let i = 0; i < policies.length; i++) {
@@ -91,19 +93,18 @@ function rewriteCsp(contentSecurityPolicy, nonce) {
         key = policy;
         value = '';
       }
-      if (key == 'script-src') {
+      if (key == 'script-src' && injectScriptNonces) {
         // Remove 'self'
         value = value.replaceAll("'self'", '').trim();
         // 'unsafe-inline' is ignored if nonces are supported.
-        value = `'strict-dynamic' 'nonce-${nonce}' ${value}`;
-        policies[i] = `${key} ${value.trim()}`;
-      } else if (key == 'style-src') {
-        value = `'nonce-${nonce}' ${value}`
-        policies[i] = `${key} ${value.trim()}`;
+        value = `'strict-dynamic' 'nonce-$${nonce}' $${value}`;
+        policies[i] = `$${key} $${value.trim()}`;
+      } else if (key == 'style-src' && injectStyleNonces) {
+        value = `'nonce-$${nonce}' $${value}`
+        policies[i] = `$${key} $${value.trim()}`;
       }
     }
     contentSecurityPolicy = policies.join('; ');
-    // Add back in the reassembled policy
   } catch (ex) {
     console.error("Could not rewrite content security policy", ex);
   }
@@ -151,27 +152,26 @@ exports.handler = async (event) => {
     }
 
     contentSecurityPolicy =
-    rewriteCsp(contentSecurityPolicy, nonce);
+    rewriteCsp(contentSecurityPolicy, nonce, request);
     console.log(contentSecurityPolicy);
 
     if (html) {
-      html = html
-        .replaceAll('<script', `<script nonce="${nonce}"`)
-        .replaceAll('<style', `<style nonce="${nonce}"`)
-        .replaceAll('<link', `<link nonce="${nonce}"`)
+      if (injectScriptNonces) {
+        html = html.replaceAll('<script', `<script nonce="$${nonce}"`);
         // This is specific to an angular app with a root element
-        // of "app-root"
-        .replaceAll('<app-root', `<app-root ngCspNonce="${nonce}"`);
+        // of "app-root", only add if script nonces are enabled
+        html = html.replaceAll('<app-root', `<app-root ngCspNonce="$${nonce}"`);
+      }
+      if (injectStyleNonces) {
+        html = html
+          .replaceAll('<style', `<style nonce="$${nonce}"`)
+          .replaceAll('<link', `<link nonce="$${nonce}"`);
+      }
 
       newHeaders['content-type'] =
         [{key: 'Content-Type', value: 'text/html'}];
       newHeaders['content-encoding'] =
         [{key: 'Content-Encoding', value: 'UTF-8'}];
-      // Send private cache only
-      newHeaders['cache-control'] = [{
-        key: 'Cache-Control',
-        value: 'must-understand, private, max-age=600'
-      }];
       newHeaders['content-security-policy'] = [{
         key: 'Content-Security-Policy',
         value: contentSecurityPolicy
