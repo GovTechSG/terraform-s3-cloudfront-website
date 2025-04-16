@@ -1,19 +1,28 @@
+# Generate Lambda function code from template
+resource "local_file" "nonce_injector" {
+  count = var.enable_nonce ? 1 : 0
+  content = templatefile("${path.module}/lambda/nonce-injector/index.js.tpl", {
+    inject_script_nonces = var.nonce_injection_config.inject_script_nonces
+    inject_style_nonces  = var.nonce_injection_config.inject_style_nonces
+  })
+  filename = "${path.module}/lambda/nonce-injector/index.js"
+}
+
 # Install dependencies and create archive
 resource "null_resource" "nonce_injector_deps" {
   count = var.enable_nonce ? 1 : 0
   triggers = {
     package_json = filemd5("${path.module}/lambda/nonce-injector/package.json")
-    source_code  = filemd5("${path.module}/lambda/nonce-injector/index.js")
+    source_code  = local_file.nonce_injector[0].content_base64sha256
   }
 
   provisioner "local-exec" {
-    command = <<EOT
-      cd ${path.module}/lambda/nonce-injector && \
-      npm install --production
+    command = <<-EOT
+      cd ${path.module}/lambda/nonce-injector && npm install
     EOT
   }
 
-
+  depends_on = [local_file.nonce_injector]
 }
 
 data "archive_file" "nonce_injector" {

@@ -99,9 +99,21 @@ variable "forward_query_string" {
 }
 
 variable "enable_nonce" {
-  description = "Enable nonce injection for Content Security Policy"
+  description = "Enable nonce injection feature. This controls whether the Lambda function is deployed and associated with CloudFront."
   type        = bool
   default     = false
+}
+
+variable "nonce_injection_config" {
+  description = "Configuration for nonce injection when enable_nonce is true. Determines which types of tags receive nonces."
+  type = object({
+    inject_script_nonces = bool
+    inject_style_nonces  = bool
+  })
+  default = {
+    inject_script_nonces = true
+    inject_style_nonces  = true
+  }
 }
 
 variable "content_security_policy" {
