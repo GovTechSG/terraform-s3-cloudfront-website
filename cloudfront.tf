@@ -70,9 +70,9 @@ resource "aws_cloudfront_response_headers_policy" "web_dist" {
     }
 
     xss_protection {
-      mode_block = false
+      mode_block = true 
       override   = true
-      protection = false
+      protection = true 
     }
 
     strict_transport_security {
