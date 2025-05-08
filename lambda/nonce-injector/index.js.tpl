@@ -97,7 +97,7 @@ function rewriteCsp(contentSecurityPolicy, nonce, request) {
         // Remove 'self'
         value = value.replaceAll("'self'", '').trim();
         // 'unsafe-inline' is ignored if nonces are supported.
-        value = `'strict-dynamic' 'nonce-$${nonce}' $${value}`;
+        value = ` 'nonce-$${nonce}' 'strict-dynamic' $${value}`;
         policies[i] = `$${key} $${value.trim()}`;
       } else if (key == 'style-src' && injectStyleNonces) {
         value = `'nonce-$${nonce}' $${value}`
