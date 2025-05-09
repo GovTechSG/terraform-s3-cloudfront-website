@@ -67,6 +67,62 @@ module "cloudfront" {
 - Only works with HTML files and requires proper Content-Type headers
 - For Angular applications, also injects `ngCspNonce` attribute on the `<app-root>` element when script nonces are enabled
 
+### Custom Error Responses
+
+This module supports configurable custom error responses for CloudFront distributions. This allows you to customize how different HTTP error codes are handled, such as serving custom error pages or routing all errors to your SPA's index.html file.
+
+By default, the module is configured for Single Page Applications (SPAs) and will route common error codes (400, 403, 404, 500, 503) to `/index.html` with a 200 response code.
+
+**Example Configuration for SPA:**
+```hcl
+module "cloudfront" {
+  source = "..."
+  
+  # Default configuration routes all errors to index.html for SPAs
+  # No additional configuration needed
+}
+```
+
+**Example Configuration for Custom Error Pages:**
+```hcl
+module "cloudfront" {
+  source = "..."
+  
+  custom_error_responses = [
+    {
+      error_code         = 404
+      response_code      = 404
+      response_page_path = "/error/404.html"
+    },
+    {
+      error_code         = 500
+      response_code      = 500
+      response_page_path = "/error/500.html"
+    }
+  ]
+}
+```
+
+**Example Configuration for Mixed Approach:**
+```hcl
+module "cloudfront" {
+  source = "..."
+  
+  custom_error_responses = [
+    {
+      error_code         = 403
+      response_code      = 200
+      response_page_path = "/index.html"
+    },
+    {
+      error_code         = 404
+      response_code      = 404
+      response_page_path = "/error/404.html"
+    }
+  ]
+}
+```
+
 ```
 locals {
   default-src = join(" ", ["default-src", "'none'"])

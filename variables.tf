@@ -127,3 +127,39 @@ variable "enable_compression" {
   default     = true
   type        = bool
 }
+
+variable "custom_error_responses" {
+  description = "Custom error responses for CloudFront distribution. For SPA applications, set response_code to 200 and response_page_path to /index.html"
+  type = list(object({
+    error_code         = number
+    response_code      = number
+    response_page_path = string
+  }))
+  default = [
+    {
+      error_code         = 400
+      response_code      = 200
+      response_page_path = "/index.html"
+    },
+    {
+      error_code         = 403
+      response_code      = 200
+      response_page_path = "/index.html"
+    },
+    {
+      error_code         = 404
+      response_code      = 200
+      response_page_path = "/index.html"
+    },
+    {
+      error_code         = 500
+      response_code      = 200
+      response_page_path = "/index.html"
+    },
+    {
+      error_code         = 503
+      response_code      = 200
+      response_page_path = "/index.html"
+    }
+  ]
+}

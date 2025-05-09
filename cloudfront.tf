@@ -119,11 +119,14 @@ resource "aws_cloudfront_distribution" "web_dist" {
     }
   }
 
-  # SPA
-  custom_error_response {
-    error_code         = 403
-    response_code      = 200
-    response_page_path = "/index.html"
+  # Custom error responses
+  dynamic "custom_error_response" {
+    for_each = var.custom_error_responses
+    content {
+      error_code         = custom_error_response.value.error_code
+      response_code      = custom_error_response.value.response_code
+      response_page_path = custom_error_response.value.response_page_path
+    }
   }
 
   dynamic "logging_config" {
@@ -243,6 +246,16 @@ resource "aws_cloudfront_distribution" "web_redirect" {
       include_cookies = true
       bucket          = "${var.s3_logging_bucket}.s3.amazonaws.com"
       prefix          = "cloudfront/${var.redirect_domain_names[0]}"
+    }
+  }
+
+  # Custom error responses
+  dynamic "custom_error_response" {
+    for_each = var.custom_error_responses
+    content {
+      error_code         = custom_error_response.value.error_code
+      response_code      = custom_error_response.value.response_code
+      response_page_path = custom_error_response.value.response_page_path
     }
   }
 
