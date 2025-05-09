@@ -152,6 +152,11 @@ variable "custom_error_responses" {
       response_page_path = "/index.html"
     },
     {
+      error_code         = 405
+      response_code      = 200
+      response_page_path = "/index.html"
+    },
+    {
       error_code         = 500
       response_code      = 200
       response_page_path = "/index.html"
@@ -161,5 +166,10 @@ variable "custom_error_responses" {
       response_code      = 200
       response_page_path = "/index.html"
     }
+    {
+      error_code         = 504
+      response_code      = 200
+      response_page_path = "/index.html"
+    },
   ]
 }
