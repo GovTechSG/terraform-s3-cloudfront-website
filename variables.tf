@@ -165,7 +165,7 @@ variable "custom_error_responses" {
       error_code         = 503
       response_code      = 200
       response_page_path = "/index.html"
-    }
+    },
     {
       error_code         = 504
       response_code      = 200
