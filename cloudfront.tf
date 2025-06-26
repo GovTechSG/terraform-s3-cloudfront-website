@@ -19,9 +19,9 @@ locals {
     allowed_methods            = ["GET", "HEAD", "OPTIONS"]
     cached_methods             = ["GET", "HEAD", "OPTIONS"]
     compress                   = var.enable_compression
-    default_ttl                = var.main_default_ttl
-    min_ttl                    = 0
-    max_ttl                    = 86400
+    default_ttl                = var.enable_ttl ? var.main_default_ttl : null
+    min_ttl                    = var.enable_ttl ? var.main_min_ttl : null
+    max_ttl                    = var.enable_ttl ? var.main_max_ttl : null
     viewer_protocol_policy     = "redirect-to-https"
     forward_query_string       = var.forward_query_string
     forward_headers           = ["Origin", "Access-Control-Request-Method", "Access-Control-Request-Headers"]
