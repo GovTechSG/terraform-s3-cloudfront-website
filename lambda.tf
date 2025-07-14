@@ -70,7 +70,7 @@ resource "aws_iam_role_policy" "lambda_edge_logs" {
           "logs:CreateLogStream",
           "logs:PutLogEvents"
         ]
-        Resource = "arn:aws:logs:us-east-1:*:log-group:/aws/lambda/us-east-1.${var.service_name}-nonce-injector*"
+        Resource = "arn:aws:logs:us-east-1:*:log-group:/aws/lambda/${var.service_name}-nonce-injector*"
       }
     ]
   })
@@ -116,6 +116,6 @@ resource "aws_lambda_function" "nonce_injector" {
 resource "aws_cloudwatch_log_group" "nonce_injector" {
   provider = aws.us-east-1  # Must be in the same region as the Lambda function
   count             = var.enable_nonce ? 1 : 0
-  name              = "/aws/lambda/us-east-1.${aws_lambda_function.nonce_injector[0].function_name}"
+  name              = "/aws/lambda/${aws_lambda_function.nonce_injector[0].function_name}"
   retention_in_days = 14  # Retain logs for 14 days
 }
