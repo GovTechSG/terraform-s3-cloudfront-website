@@ -30,7 +30,7 @@ data "archive_file" "nonce_injector" {
   type        = "zip"
   source_dir  = "${path.module}/lambda/nonce-injector"
   output_path = "${path.module}/lambda/nonce-injector.zip"
-  
+
   depends_on = [null_resource.nonce_injector_deps]
 }
 
@@ -55,9 +55,25 @@ resource "aws_iam_role" "lambda_edge" {
   permissions_boundary = var.permissions_boundary != "" ? var.permissions_boundary : null
 }
 
-resource "aws_iam_role_policy_attachment" "lambda_edge_basic" {
-  policy_arn = "arn:aws:iam::aws:policy/service-role/AWSLambdaBasicExecutionRole"
-  role       = aws_iam_role.lambda_edge.name
+resource "aws_iam_role_policy" "lambda_edge_logs" {
+  count = var.enable_nonce ? 1 : 0
+  name  = "${var.service_name}-lambda-edge-logs"
+  role  = aws_iam_role.lambda_edge.id
+
+  policy = jsonencode({
+    Version = "2012-10-17"
+    Statement = [
+      {
+        Effect = "Allow"
+        Action = [
+          "logs:CreateLogGroup",
+          "logs:CreateLogStream",
+          "logs:PutLogEvents"
+        ]
+        Resource = "/aws/lambda/us-east-1.${aws_lambda_function.nonce_injector[0].function_name}"
+      }
+    ]
+  })
 }
 
 resource "aws_iam_role_policy" "lambda_edge_s3" {
