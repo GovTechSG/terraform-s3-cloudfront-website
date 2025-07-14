@@ -70,7 +70,7 @@ resource "aws_iam_role_policy" "lambda_edge_logs" {
           "logs:CreateLogStream",
           "logs:PutLogEvents"
         ]
-        Resource = "/aws/lambda/us-east-1.${aws_lambda_function.nonce_injector[0].function_name}"
+        Resource = "arn:aws:logs:us-east-1:*:log-group:/aws/lambda/us-east-1.${var.service_name}-nonce-injector*"
       }
     ]
   })
